@@ -1,0 +1,14 @@
+# A medium support-assistant workload, optimized with caching, compression, and
+# routing most traffic to a cheaper model. Run: llmcost estimate examples/scenario.yaml --compare
+model_id: claude-opus-4-8
+workload:
+  tokens_in: 2000
+  tokens_out: 500
+  requests_per_month: 1000000
+optimization:
+  cache_hit_rate: 0.3
+  cache_read_multiplier: 0.1
+  input_reduction: 0.2
+  routes:
+    - { model_id: claude-haiku-4-5, weight: 0.7 }
+    - { model_id: claude-sonnet-4-6, weight: 0.3 }
