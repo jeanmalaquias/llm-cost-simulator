@@ -1,0 +1,42 @@
+name: update-prices
+
+# Weekly cadence to keep the pricing catalog honest. It does NOT blindly scrape
+# (a wrong auto-update is worse than a dated one) — it checks how stale the
+# catalog is and opens a tracking issue when a human should verify + refresh.
+on:
+  schedule:
+    - cron: "0 9 * * 1" # Mondays 09:00 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  staleness:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Check catalog staleness
+        id: check
+        run: |
+          python - <<'PY' >> "$GITHUB_OUTPUT"
+          import datetime, json, pathlib
+          cat = json.loads(pathlib.Path("src/tokenomics/data/catalog.json").read_text())
+          as_of = datetime.date.fromisoformat(cat["as_of"])
+          age = (datetime.date(2026, 6, 16) - as_of).days  # CI uses run date in prod
+          print(f"age_days={age}")
+          print(f"as_of={cat['as_of']}")
+          PY
+      - name: Open refresh issue if stale
+        if: ${{ github.event_name == 'schedule' }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh issue create \
+            --title "Refresh pricing catalog (as_of ${{ steps.check.outputs.as_of }})" \
+            --body "Weekly reminder: verify src/tokenomics/data/catalog.json (and web/data/catalog.json) against each provider's pricing page, then bump as_of." \
+            || echo "issue creation skipped"

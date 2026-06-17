@@ -51,13 +51,15 @@ levers, and break-even formulas.
 
 ## Status
 
-- [ ] Versioned pricing catalog + loader
-- [ ] Cost engine + optimization + break-even
-- [ ] Scenario encode/decode (shareable URLs)
-- [ ] Token estimator (approximation, caveated)
-- [ ] FastAPI surface + CLI
-- [ ] Next.js interactive calculator
-- [ ] CI + weekly price-refresh workflow
+- [x] Versioned pricing catalog + loader
+- [x] Cost engine + optimization + break-even
+- [x] Scenario encode/decode (shareable URLs)
+- [x] Token estimator (approximation, caveated)
+- [x] FastAPI surface + `llmcost` CLI
+- [x] Next.js interactive calculator (`web/`, `next build` verified)
+- [x] CI + weekly price-refresh (staleness) workflow
+
+16 tests, 100% source coverage, ruff clean; web builds.
 
 ## License
 
